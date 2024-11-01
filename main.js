@@ -3,7 +3,6 @@ const canvas = document.getElementById("canvas");
 /** @type {CanvasRenderingContext2D} */
 const ctx = canvas.getContext("2d");
 
-
 canvas.height = document.body.clientHeight;
 
 const MODES = {
@@ -22,10 +21,17 @@ const INITIAL_X_SPEED = 2;
 // State
 let debris = { x: 0, y: 0, width: 0, height: BOX_HIGHT };
 let boxes = [];
-let scrollCounter, cameraY, current, mode, xSpeed, ySpeed;
+let scrollCounter, cameraY, current, mode, xSpeed, ySpeed, sfxPlayMode;
+let borderOpacity = 1;
+let opacityValue = 0;
+let existInterval = false;
+let enableInterval = false;
 
 
+sfxPlayMode = new Audio("assets/sfx/ambient-04.mp3");
+sfxPlayMode.loop = true;
 function initGameState() {
+   sfxPlayMode.play();
    score.textContent = "1";
    boxes = [{
       x: canvas.width / 2 - INITIAL_BOX_WIDTH / 2, // para centrar la primera caja.
@@ -61,7 +67,10 @@ function draw() {
       case MODES.FALL: updateFallMode();
          break;
    }
-
+   // if(sfxPlayMode.ended){
+   //    sfxPlayMode.play();
+   // }
+   // updateCanvasBorderColor();
    updateCamera();
    window.requestAnimationFrame(draw);
 }
@@ -110,6 +119,32 @@ function moveAndDetectCollision() {
 
    if (isMovingRight && hasHitRightSide || isMovingLeft && hasHitLeftSide) {
       xSpeed *= -1;
+      
+   }
+   const rgb = currentBox.color.substring(4, currentBox.color.length-1)
+         .replace(/ /g, '')
+         .split(',');
+   console.log(borderOpacity);
+
+   canvas.style.borderColor = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${borderOpacity})`;  
+   if (isMovingRight && hasHitRightSide) {
+      // opacityValue = 10;
+      // borderOpacity = 1;
+      // enableInterval = true;
+      // opacityValue = 10;
+      canvas.setAttribute("class", "border-right")   
+   }
+   else if (isMovingLeft && hasHitLeftSide) {
+      // borderOpacity = 1;
+      // opacityValue = 0;
+      // canvas.style.borderColor = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${borderOpacity})`;  
+      canvas.setAttribute("class", "border-left")      
+   }
+   else{
+      // setTimeout(() => {
+         canvas.setAttribute("class", "border-none")
+
+      // }, 1000);
    }
 
    document.addEventListener("keydown", (event) => {
@@ -134,19 +169,20 @@ function updateFallMode() {
 function handleBoxLanding() {
    const currentBox = boxes[current];
    const previousBox = boxes[current - 1];
-
    const difference = currentBox.x - previousBox.x;
 
    if (Math.abs(difference) >= currentBox.width) {
       mode = MODES.GAMEOVER;
       gameOver();
+      sfxPlayMode.pause();
+      const audio = new Audio("assets/sfx/game-over-31.mp3");
+      audio.play();
       return;
    }
 
    createDebris();
-
-
    removeOutsideBox();
+
    //Para incrementar la velocidad
    xSpeed += xSpeed > 0 ? 1 : -1;
    current++;
@@ -230,6 +266,28 @@ function gameOver() {
    ctx.fillStyle = "white";
    ctx.textAlign = "center";
    ctx.fillText("Game Over", canvas.width / 2, canvas.height / 2);
+}
+
+function updateCanvasBorderColor(){
+   if(!existInterval && enableInterval){
+      existInterval = true;
+      setInterval(() => {
+         borderOpacity -= 0.1;
+         // console.log(borderOpacity);
+      }, 100);
+   }
+
+   if(borderOpacity <= 0){
+      clearInterval();
+      enableInterval = false;
+      existInterval = false;
+   }
+   // if(opacityValue > 0){
+   //    borderOpacity -= 0.1;
+   //    // console.log(borderOpacity);
+   //    opacityValue--;
+   //    // console.log(opacityValue);
+   // }
 }
 
 restart();

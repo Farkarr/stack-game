@@ -15,3 +15,26 @@ canvas {
    display: flex;
    justify-content: center;
 }
+
+.border-none{
+   border: none;
+   /* outline: solid 1px transparent; */
+   /* outline-width: 0px; */
+}
+
+.border-left{
+   /* box-shadow: 0 0 0 1px white; */
+   border-left: 1px solid white;
+   /* outline-le: solid 1px #FC5185; */
+   /* transition: outline 0.6s linear; */
+   /* transition: 500ms all ease; */
+   /* transition: box-shadow 500ms all ease; */
+}
+
+.border-right{
+   /* box-shadow: 0 0 0 1px white; */
+   /* outline: solid 1px #FC5185; */
+   /* transition: outline 0.6s linear; */
+   border-right: 1px solid white;
+   /* transition: 500ms all; */
+}
