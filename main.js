@@ -1,7 +1,11 @@
 const score = document.getElementById("score");
+const btnPlay = document.getElementById("btnPlay");
+const btnPause = document.getElementById("btnPause");
 const canvas = document.getElementById("canvas");
 /** @type {CanvasRenderingContext2D} */
 const ctx = canvas.getContext("2d");
+
+
 
 canvas.height = document.body.clientHeight;
 
@@ -30,6 +34,13 @@ let enableInterval = false;
 
 sfxPlayMode = new Audio("assets/sfx/ambient-04.mp3");
 sfxPlayMode.loop = true;
+btnPlay.addEventListener("click", () => {
+   sfxPlayMode.play()
+});
+
+btnPause.addEventListener("click", () => {
+   sfxPlayMode.pause()
+});
 function initGameState() {
    sfxPlayMode.play();
    score.textContent = "1";
